@@ -1,2 +1,2 @@
-# vml-zap
+# zapvml
 Zap configuration for vml
