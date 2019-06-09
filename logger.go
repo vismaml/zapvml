@@ -19,8 +19,13 @@ var (
 )
 
 // Init initializes log by input parameters
-func Init(globalLevel zapcore.Level) {
+func Init(level string) {
 	onceInit.Do(func() {
+		// Use InfoLevel as default, if another level has been set when calling init use that level.
+		// possible string levels "debug, info, warn, error, panic, fatal", levels that does not match thoes
+		// will leave logger at default level.
+		globalLevel := zapcore.InfoLevel
+		globalLevel.UnmarshalText([]byte(level))
 		// High-priority output should also go to standard error, and low-priority
 		// output should also go to standard out.
 		// It is useful for Kubernetes deployment.
