@@ -54,18 +54,20 @@ func init() {
 
 	// Setup Config and Encoder
 	var ecfg zapcore.EncoderConfig
+	var enc zapcore.Encoder
 	if cfg.Debug {
 		ecfg = zapdriver.NewDevelopmentEncoderConfig()
+		enc = zapcore.NewConsoleEncoder(ecfg)
 	} else {
 		ecfg = zapdriver.NewProductionEncoderConfig()
+		enc = zapcore.NewJSONEncoder(ecfg)
 	}
-	consoleEncoder := zapcore.NewJSONEncoder(ecfg)
 
 	// Join the outputs, encoders, and level-handling functions into
 	// zapcore.
 	core := zapcore.NewTee(
-		zapcore.NewCore(consoleEncoder, consoleErrors, highPriority),
-		zapcore.NewCore(consoleEncoder, consoleInfos, lowPriority),
+		zapcore.NewCore(enc, consoleErrors, highPriority),
+		zapcore.NewCore(enc, consoleInfos, lowPriority),
 	)
 	// From a zapcore.Core, it's easy to construct a Logger.
 	Log = zap.New(core)
