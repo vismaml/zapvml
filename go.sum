@@ -2,6 +2,8 @@ cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMT
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/blendle/zapdriver v1.1.6 h1:mtx/5zo+R5a/+5pPZCGIHAx+velCQI2yYo4ozoBPYZw=
 github.com/blendle/zapdriver v1.1.6/go.mod h1:E6/B7Fu2qFuScQ/smemn7qnhIDKKf9C/Xdv/jAA4TA0=
+github.com/blendle/zapdriver v1.2.1 h1:CwapMXZCok+D9b/FuVF82Mwf4GfxffJIeJKZ1Mhm4Rg=
+github.com/blendle/zapdriver v1.2.1/go.mod h1:mdXfREi6u5MArG4j9fewC+FGnXaBR+T4Ox4J2u4eHCc=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
