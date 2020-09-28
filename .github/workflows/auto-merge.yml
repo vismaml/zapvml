@@ -1,0 +1,21 @@
+name: Automatic pull request review and merge
+on:
+  pull_request:
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Comment PR'
+        uses: actions/github-script@0.3.0
+        if: github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.user.login == 'dependabot-preview[bot]'
+        with:
+          github-token: ${{ secrets.AUTOMERGE }}
+          script: |
+            const { issue: { number: issue_number }, repo: { owner, repo }  } = context;
+            github.issues.createComment({ issue_number, owner, repo, body: '![](https://media4.giphy.com/media/idjlI0ixTP6KP7yVAK/giphy.gif)' });
+      - uses: actions/checkout@v2
+      - name: Auto approve and merge
+        uses: ahmadnassri/action-dependabot-auto-merge@v2
+        with:
+          github-token: ${{ secrets.AUTOMERGE }}
+          target: minor
