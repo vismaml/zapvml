@@ -6,5 +6,5 @@ require (
 	github.com/blendle/zapdriver v1.3.1
 	github.com/kelseyhightower/envconfig v1.4.0
 	go.uber.org/zap v1.16.0
-	google.golang.org/grpc v1.34.0
+	google.golang.org/grpc v1.34.1
 )
