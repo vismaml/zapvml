@@ -23,7 +23,7 @@ type encoder struct {
 var functionNamePattern = regexp.MustCompile(`(?m)^(\S+)$`)
 
 func (s *encoder) EncodeEntry(ent zapcore.Entry, fields []zapcore.Field) (*buffer.Buffer, error) {
-	if ent.Stack != "" {
+	if ent.Level == zapcore.ErrorLevel && ent.Stack != "" {
 		// Make the message look like a real panic, so Stackdriver error reporting picks it up.
 		// This used to need the string "panic: " at the beginning, but no longer seems to need it!
 		// ent.Message = "panic: " + ent.Message + "\n\ngoroutine 1 [running]:\n"
