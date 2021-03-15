@@ -1,8 +1,6 @@
 package zapvml
 
 import (
-	"os"
-
 	"github.com/blendle/zapdriver"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -18,8 +16,9 @@ var (
 )
 
 type Config struct {
-	Level zapcore.Level `required:"true" default:"warn"`
-	Debug bool          `required:"true" default:"false"`
+	Level       zapcore.Level `required:"true" default:"warn"`
+	Debug       bool          `required:"true" default:"false"`
+	ServiceName string        `required:"true" default:"default_service"`
 }
 
 func Init(globalLevel zapcore.Level) {
@@ -34,43 +33,28 @@ func init() {
 		panic(err)
 	}
 
-	Level = zap.NewAtomicLevelAt(cfg.Level)
-
-	// High-priority output should also go to standard error, and low-priority
-	// output should also go to standard out.
-	// It is useful for Kubernetes deployment.
-	// Kubernetes interprets os.Stdout log items as INFO and os.Stderr log items
-	// as ERROR by default.
-	highPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-		return lvl >= zapcore.ErrorLevel
-	})
-	lowPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-		return lvl >= Level.Level() && lvl < zapcore.ErrorLevel
-	})
-
-	// Output channels
-	consoleInfos := zapcore.Lock(os.Stdout)
-	consoleErrors := zapcore.Lock(os.Stderr)
-
-	// Setup Config and Encoder
-	var ecfg zapcore.EncoderConfig
-	var enc zapcore.Encoder
-	if cfg.Debug {
-		ecfg = zapdriver.NewDevelopmentEncoderConfig()
-		enc = zapcore.NewConsoleEncoder(ecfg)
-	} else {
-		ecfg = zapdriver.NewProductionEncoderConfig()
-		enc = zapcore.NewJSONEncoder(ecfg)
+	err := zap.RegisterEncoder("stackdriver-json", newEncoder)
+	if err != nil {
+		panic(err)
 	}
 
-	// Join the outputs, encoders, and level-handling functions into
-	// zapcore.
-	core := zapcore.NewTee(
-		zapcore.NewCore(enc, consoleErrors, highPriority),
-		zapcore.NewCore(enc, consoleInfos, lowPriority),
-	)
-	// From a zapcore.Core, it's easy to construct a Logger.
-	Log = zap.New(core)
+	var config zap.Config
+	if cfg.Debug {
+		config = zapdriver.NewDevelopmentConfig()
+	} else {
+		config = zapdriver.NewProductionConfig()
+	}
+
+	config.Encoding = "stackdriver-json"
+
+	Log, err := config.Build(zapdriver.WrapCore(
+		zapdriver.ReportAllErrors(true),
+		zapdriver.ServiceName(cfg.ServiceName),
+	))
+	if err != nil {
+		panic(err)
+	}
+
 	zap.RedirectStdLog(Log)
 }
 
