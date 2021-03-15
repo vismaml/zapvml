@@ -47,7 +47,7 @@ func init() {
 
 	config.Encoding = "stackdriver-json"
 
-	Log, err := config.Build(zapdriver.WrapCore(
+	Log, err = config.Build(zapdriver.WrapCore(
 		zapdriver.ReportAllErrors(true),
 		zapdriver.ServiceName(cfg.ServiceName),
 	))
