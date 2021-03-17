@@ -71,7 +71,7 @@ func CodeToLevel(code codes.Code) zapcore.Level {
 	case codes.DeadlineExceeded:
 		return zap.WarnLevel
 	case codes.NotFound:
-		return zap.ErrorLevel
+		return zap.WarnLevel
 	case codes.AlreadyExists:
 		return zap.WarnLevel
 	case codes.PermissionDenied:
