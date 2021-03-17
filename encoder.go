@@ -36,3 +36,7 @@ func (s *Encoder) EncodeEntry(ent zapcore.Entry, fields []zapcore.Field) (*buffe
 	}
 	return s.Encoder.EncodeEntry(ent, fields)
 }
+
+func (s *Encoder) Clone() zapcore.Encoder {
+	return &Encoder{s.Encoder.Clone()}
+}
