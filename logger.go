@@ -37,11 +37,6 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-
-	err := zap.RegisterEncoder("stackdriver-json", newEncoder)
-	if err != nil {
-		panic(err)
-	}
 	
 	var config zap.Config
 	if cfg.Debug {
