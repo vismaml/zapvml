@@ -12,7 +12,6 @@ import (
 var (
 	// Log is global logger
 	Log *zap.Logger
-	//Level zap.AtomicLevel
 )
 
 type Config struct {
