@@ -11,19 +11,18 @@ import (
 
 var (
 	// Log is global logger
-	Log   *zap.Logger
-	Level zap.AtomicLevel
+	Log *zap.Logger
+	//Level zap.AtomicLevel
 )
 
 type Config struct {
 	Level       zapcore.Level `required:"true" default:"warn"`
-	Debug       bool          `required:"true" default:"false"`
 	ServiceName string        `required:"true" default:"default_service"`
 }
 
-func Init(globalLevel zapcore.Level) {
-	Level.SetLevel(globalLevel)
-}
+// func Init(globalLevel zapcore.Level) {
+// 	Level.SetLevel(globalLevel)
+// }
 
 // Use package init to avoid race conditions for GRPC options
 // sync.Once still suffers from races, init functions are less complex than sync.once + waitgroup
@@ -39,7 +38,7 @@ func init() {
 	}
 
 	var config zap.Config
-	if cfg.Debug {
+	if cfg.Level == zap.DebugLevel {
 		config = zapdriver.NewDevelopmentConfig()
 		config.Encoding = "console"
 	} else {
@@ -52,7 +51,6 @@ func init() {
 		zapdriver.ServiceName(cfg.ServiceName),
 	))
 	if err != nil {
-
 		panic(err)
 	}
 
