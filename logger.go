@@ -37,14 +37,14 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	var config zap.Config
 	if cfg.Debug {
 		config = zapdriver.NewDevelopmentConfig()
 		config.Encoding = "console"
 	} else {
 		config = zapdriver.NewProductionConfig()
-	        config.Encoding = "stackdriver-json"
+		config.Encoding = "stackdriver-json"
 	}
 
 	Log, err = config.Build(zapdriver.WrapCore(
@@ -52,6 +52,7 @@ func init() {
 		zapdriver.ServiceName(cfg.ServiceName),
 	))
 	if err != nil {
+
 		panic(err)
 	}
 
