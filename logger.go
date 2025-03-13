@@ -41,6 +41,14 @@ func init() {
 	if cfg.Level == zap.DebugLevel {
 		config = zapdriver.NewDevelopmentConfig()
 		config.Encoding = "console"
+	} else if cfg.Level == zap.InfoLevel {
+		config = zapdriver.NewProductionConfig()
+		config.Encoding = "stackdriver-json"
+		config.Level = zap.NewAtomicLevelAt(zap.InfoLevel)
+	} else if cfg.Level == zap.WarnLevel {
+		config = zapdriver.NewProductionConfig()
+		config.Encoding = "stackdriver-json"
+		config.Level = zap.NewAtomicLevelAt(zap.WarnLevel)
 	} else {
 		config = zapdriver.NewProductionConfig()
 		config.Encoding = "stackdriver-json"
