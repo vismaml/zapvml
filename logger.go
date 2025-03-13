@@ -11,18 +11,12 @@ import (
 
 var (
 	// Log is global logger
-	Log   *zap.Logger
-	Level zap.AtomicLevel
+	Log *zap.Logger
 )
 
 type Config struct {
 	Level       zapcore.Level `required:"true" default:"warn"`
-	Debug       bool          `required:"true" default:"false"`
 	ServiceName string        `required:"true" default:"default_service"`
-}
-
-func Init(globalLevel zapcore.Level) {
-	Level.SetLevel(globalLevel)
 }
 
 // Use package init to avoid race conditions for GRPC options
@@ -37,14 +31,23 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	var config zap.Config
-	if cfg.Debug {
+	switch cfg.Level {
+	case zap.DebugLevel:
 		config = zapdriver.NewDevelopmentConfig()
 		config.Encoding = "console"
-	} else {
+	case zap.InfoLevel:
 		config = zapdriver.NewProductionConfig()
-	        config.Encoding = "stackdriver-json"
+		config.Encoding = "stackdriver-json"
+		config.Level = zap.NewAtomicLevelAt(zap.InfoLevel)
+	case zap.WarnLevel:
+		config = zapdriver.NewProductionConfig()
+		config.Encoding = "stackdriver-json"
+		config.Level = zap.NewAtomicLevelAt(zap.WarnLevel)
+	default:
+		config = zapdriver.NewProductionConfig()
+		config.Encoding = "stackdriver-json"
 	}
 
 	Log, err = config.Build(zapdriver.WrapCore(
