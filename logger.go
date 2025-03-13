@@ -20,10 +20,6 @@ type Config struct {
 	ServiceName string        `required:"true" default:"default_service"`
 }
 
-// func Init(globalLevel zapcore.Level) {
-// 	Level.SetLevel(globalLevel)
-// }
-
 // Use package init to avoid race conditions for GRPC options
 // sync.Once still suffers from races, init functions are less complex than sync.once + waitgroup
 func init() {
@@ -38,18 +34,19 @@ func init() {
 	}
 
 	var config zap.Config
-	if cfg.Level == zap.DebugLevel {
+	switch cfg.Level {
+	case zap.DebugLevel:
 		config = zapdriver.NewDevelopmentConfig()
 		config.Encoding = "console"
-	} else if cfg.Level == zap.InfoLevel {
+	case zap.InfoLevel:
 		config = zapdriver.NewProductionConfig()
 		config.Encoding = "stackdriver-json"
 		config.Level = zap.NewAtomicLevelAt(zap.InfoLevel)
-	} else if cfg.Level == zap.WarnLevel {
+	case zap.WarnLevel:
 		config = zapdriver.NewProductionConfig()
 		config.Encoding = "stackdriver-json"
 		config.Level = zap.NewAtomicLevelAt(zap.WarnLevel)
-	} else {
+	default:
 		config = zapdriver.NewProductionConfig()
 		config.Encoding = "stackdriver-json"
 	}
