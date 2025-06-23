@@ -1,43 +1,57 @@
-linters:
-  enable-all: true
-  disable:
-    - maligned
-    - prealloc
-    - gochecknoglobals
-    - gochecknoinits
-    - wsl
+version: 2
 
-linters-settings:
-  govet:
-    check-shadowing: true
-  golint:
-    min-confidence: 0
-  gocyclo:
-    min-complexity: 20
-  maligned:
-    suggest-new: true
-  dupl:
-    threshold: 100
-  goconst:
-    min-len: 2
-    min-occurrences: 2
-  misspell:
-    locale: US
-  lll:
-    line-length: 140
-  goimports:
-    local-prefixes: github.com/golangci/golangci-lint
-  gocritic:
-    enabled-tags:
-      - performance
-      - style
-      - experimental
-    disabled-checks:
-      - wrapperFunc
-      - unnamedResult
+run:
+  timeout: 5m
+  go: "1.24"
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+
+linters:
+  enable:
+    # Default/recommended linters for Go projects
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    # Additional useful linters
+    - gocyclo
+    - misspell
+    - revive
+    - bodyclose
+    # Code quality linters
+    - gosec
+    - unconvert
+    - gocognit
+    - prealloc
+  settings:
+    govet:
+      enable:
+        - shadow
+    gocyclo:
+      min-complexity: 15
+    misspell:
+      locale: US
+    revive:
+      min-confidence: 0.8
+    lll:
+      line-length: 120
 
 issues:
-  exclude-rules:
-    - text: "Binds to all network interfaces"
+  exclude-use-default: false
+  exclude:
+    # Exclude some linters from running on tests files.
+    - path: _test\.go
       linters:
+        - gocyclo
+        - errcheck
+        - dupl
         - gosec
+
+output:
+  format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
