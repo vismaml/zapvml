@@ -1,8 +1,6 @@
 package zapvml
 
 import (
-	"strings"
-
 	"github.com/blendle/zapdriver"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -18,9 +16,8 @@ var (
 
 // Config represents the configuration options for the logger.
 type Config struct {
-	Level               zapcore.Level `required:"true" default:"warn"`
-	ServiceName         string        `required:"true" default:"default_service"`
-	EnableCtxtraceWarns bool          `default:"false"`
+	Level       zapcore.Level `required:"true" default:"warn"`
+	ServiceName string        `required:"true" default:"default_service"`
 }
 
 // Use package init to avoid race conditions for GRPC options
@@ -57,9 +54,7 @@ func init() {
 	Log, err = config.Build(zapdriver.WrapCore(
 		zapdriver.ReportAllErrors(true),
 		zapdriver.ServiceName(cfg.ServiceName),
-	), zap.WrapCore(func(core zapcore.Core) zapcore.Core {
-		return newFilteringCore(core, cfg.EnableCtxtraceWarns)
-	}))
+	))
 	if err != nil {
 		panic(err)
 	}
@@ -108,47 +103,5 @@ func CodeToLevel(code codes.Code) zapcore.Level {
 		return zap.ErrorLevel
 	default:
 		return zap.ErrorLevel
-	}
-}
-
-// filteringCore wraps a zapcore.Core to filter out specific log messages
-type filteringCore struct {
-	zapcore.Core
-	enableCtxtraceWarns bool
-}
-
-func newFilteringCore(core zapcore.Core, enableCtxtraceWarns bool) zapcore.Core {
-	return &filteringCore{
-		Core:                core,
-		enableCtxtraceWarns: enableCtxtraceWarns,
-	}
-}
-
-func (f *filteringCore) Check(ent zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.CheckedEntry {
-	// Filter out ctxtrace warnings if disabled
-	if !f.enableCtxtraceWarns &&
-		ent.Level == zapcore.WarnLevel &&
-		strings.Contains(ent.Caller.File, "ctxtrace") &&
-		strings.Contains(ent.Message, "b3 injection failed") {
-		return ce
-	}
-	return f.Core.Check(ent, ce)
-}
-
-func (f *filteringCore) Write(ent zapcore.Entry, fields []zapcore.Field) error {
-	// Filter out ctxtrace warnings if disabled
-	if !f.enableCtxtraceWarns &&
-		ent.Level == zapcore.WarnLevel &&
-		strings.Contains(ent.Caller.File, "ctxtrace") &&
-		strings.Contains(ent.Message, "b3 injection failed") {
-		return nil
-	}
-	return f.Core.Write(ent, fields)
-}
-
-func (f *filteringCore) With(fields []zapcore.Field) zapcore.Core {
-	return &filteringCore{
-		Core:                f.Core.With(fields),
-		enableCtxtraceWarns: f.enableCtxtraceWarns,
 	}
 }
