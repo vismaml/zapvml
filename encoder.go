@@ -1,3 +1,4 @@
+// Package zapvml provides zap logging configuration and customizations for VML services.
 package zapvml
 
 import (
@@ -11,7 +12,7 @@ func newEncoder(cfg zapcore.EncoderConfig) (zapcore.Encoder, error) {
 	return &Encoder{zapcore.NewJSONEncoder(cfg)}, nil
 }
 
-// Wraps zapcore.Encoder to customize stack traces to be picked up by Stackdriver error reporting.
+// Encoder wraps zapcore.Encoder to customize stack traces to be picked up by Stackdriver error reporting.
 // The following issue might make this unnecessary:
 // https://github.com/uber-go/zap/issues/514
 type Encoder struct {
@@ -21,6 +22,7 @@ type Encoder struct {
 // multiline pattern to match the function name line
 var functionNamePattern = regexp.MustCompile(`(?m)^(\S+)$`)
 
+// EncodeEntry customizes log entry encoding to format stack traces for Stackdriver error reporting.
 func (s *Encoder) EncodeEntry(ent zapcore.Entry, fields []zapcore.Field) (*buffer.Buffer, error) {
 	if ent.Stack != "" {
 		// Make the message look like a real panic, so Stackdriver error reporting picks it up.
@@ -37,6 +39,7 @@ func (s *Encoder) EncodeEntry(ent zapcore.Entry, fields []zapcore.Field) (*buffe
 	return s.Encoder.EncodeEntry(ent, fields)
 }
 
+// Clone creates a copy of the encoder.
 func (s *Encoder) Clone() zapcore.Encoder {
 	return &Encoder{s.Encoder.Clone()}
 }
