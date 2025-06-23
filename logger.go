@@ -110,10 +110,16 @@ func CodeToLevel(code codes.Code) zapcore.Level {
 		return zap.ErrorLevel
 	}
 }
+
+// filteringCore wraps a zapcore.Core to filter out specific log messages
 type filteringCore struct {
 	zapcore.Core
 	enableCtxtraceWarns bool
 }
+
+func newFilteringCore(core zapcore.Core, enableCtxtraceWarns bool) zapcore.Core {
+	return &filteringCore{
+		Core:                core,
 		enableCtxtraceWarns: enableCtxtraceWarns,
 	}
 }
