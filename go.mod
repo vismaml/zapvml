@@ -1,6 +1,6 @@
 module github.com/vismaml/zapvml
 
-go 1.26.2
+go 1.26.10
 
 require (
 	github.com/blendle/zapdriver v1.3.1
